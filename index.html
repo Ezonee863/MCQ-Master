@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCQ Master</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,"Noto Sans Bengali",sans-serif;background:#f4f6f9;color:#172033}
+.app{max-width:720px;margin:auto;min-height:100vh;background:#f4f6f9}
+.header{padding:22px 18px;background:linear-gradient(135deg,#101828,#344054);color:#fff;border-radius:0 0 24px 24px}
+.logo{font-size:25px;font-weight:800}.sub{font-size:13px;opacity:.75;margin-top:5px}
+.main{padding:20px 16px 40px}.title{font-size:23px;font-weight:800;margin-bottom:7px}.desc{color:#667085;font-size:14px;margin-bottom:18px}
+.card{background:#fff;border:1px solid #e4e7ec;border-radius:18px;padding:18px;margin:12px 0;box-shadow:0 4px 16px #1018280d;cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.grid .card{margin:0}
+.icon{font-size:30px;margin-bottom:12px}.name{font-weight:800;font-size:16px}.small{font-size:12px;color:#667085;margin-top:5px}
+.primary{background:#101828;color:#fff;border:0;border-radius:14px;padding:14px 18px;font-weight:800;width:100%;font-size:15px}
+.secondary{background:#fff;border:1px solid #d0d5dd;border-radius:14px;padding:13px 18px;font-weight:700;width:100%;font-size:15px}
+.login{margin-top:35px}.profile{background:#fff;border:1px solid #e4e7ec;border-radius:18px;padding:16px;display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.avatar{width:48px;height:48px;border-radius:50%;background:#eaecf0;object-fit:cover}.loading{text-align:center;padding:50px;color:#667085}.spinner{width:34px;height:34px;border:4px solid #e4e7ec;border-top-color:#344054;border-radius:50%;margin:0 auto 12px;animation:s 1s linear infinite}@keyframes s{to{transform:rotate(360deg)}}
+.back{background:#fff;border:1px solid #d0d5dd;border-radius:12px;padding:10px 14px;margin-bottom:16px;font-weight:700}
+.error{background:#fff1f3;color:#c01048;border:1px solid #fecdca;padding:14px;border-radius:14px}
+.selected{border:2px solid #101828;background:#f8f9fc}
+.test{background:#fff;border-radius:18px;border:1px solid #e4e7ec;padding:18px}.q{font-size:19px;font-weight:700;line-height:1.6}.opt{border:1px solid #d0d5dd;border-radius:13px;padding:14px;margin-top:10px;cursor:pointer}.opt.sel{background:#eef2ff;border-color:#344054}.actions{display:flex;gap:10px;margin-top:16px}.actions button{flex:1}
+@media(max-width:430px){.grid{grid-template-columns:1fr 1fr}.title{font-size:21px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="logo">MCQ Master</div>
+    <div class="sub">University Admission • HSC • SSC</div>
+  </header>
+  <main class="main" id="app"><div class="loading"><div class="spinner"></div>Loading...</div></main>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAc7uBUZXlVWY9wfwUIf3sk8gGVrECqtRs",
+  authDomain: "call-app-d1a8b.firebaseapp.com",
+  databaseURL: "https://call-app-d1a8b-default-rtdb.firebaseio.com",
+  projectId: "call-app-d1a8b",
+  storageBucket: "call-app-d1a8b.firebasestorage.app",
+  messagingSenderId: "30464821298",
+  appId: "1:30464821298:web:e4e61a7968f6551603942b"
+};
+
+const API = "https://script.google.com/macros/s/AKfycbzvsbNTumqdAFj9QDSc6z8WNBEvJ3xKGlRr57RXLj31FOkgAxkXXONncfas1uDImJVggg/exec";
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+const root = document.getElementById("app");
+
+let user = null, profile = null, groups = [], years = [], units = [], categories = [], questions = [];
+let state = {examType:"", groupId:"", unit:"", category:"", year:"", subject:""};
+let qi=0, selected={};
+
+const esc = s => String(s ?? "").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const loading = t => `<div class="loading"><div class="spinner"></div>${esc(t)}</div>`;
+
+async function api(params){
+  const r = await fetch(API+"?"+new URLSearchParams(params));
+  const d = await r.json();
+  if(!d.success) throw new Error(d.error||"API error");
+  return d;
+}
+
+/* Account POST is intentionally kept here; Apps Script doPost handles it.
+   If GitHub Pages blocks a cross-origin POST in a browser, the next backend
+   revision will use a GET-safe account endpoint. */
+async function saveAccount(){
+  if(!user?.email) return null;
+  const p={action:"saveAccount",email:user.email,name:user.displayName||"",
+    examType:state.examType||"",groupId:state.groupId||"",unit:state.unit||"",
+    category:state.category||"",year:state.year||""};
+  try{return await api(p)}catch(e){console.warn("Account save:",e);return null;}
+}
+async function getAccount(){
+  try{
+    const d=await api({action:"getAccount",email:user.email});
+    return d.found ? d.account : null;
+  }catch(e){console.warn(e);return null;}
+}
+
+function loginScreen(){
+  root.innerHTML=`<div class="title">MCQ Master-এ স্বাগতম 👋</div>
+  <div class="desc">প্রথমে Google Account দিয়ে Sign in করুন। আপনার password আমরা সংরক্ষণ করি না।</div>
+  <div class="card login">
+    <div class="icon">🔐</div><div class="name">Google Account</div>
+    <div class="small">আপনার profile ও test progress-এর জন্য account প্রয়োজন।</div>
+    <br><button class="primary" id="googleBtn">Continue with Google</button>
+  </div>`;
+  document.getElementById("googleBtn").onclick=async()=>{
+    try{await signInWithPopup(auth,provider)}catch(e){root.innerHTML+=`<div class="error">Google Login Error: ${esc(e.message)}</div>`}
+  };
+}
+
+function profileHeader(){
+  return `<div class="profile">${user.photoURL?`<img class="avatar" src="${esc(user.photoURL)}">`:`<div class="avatar"></div>`}
+  <div style="flex:1"><b>${esc(user.displayName||"User")}</b><div class="small">${esc(user.email)}</div></div>
+  <button class="secondary" style="width:auto;padding:8px 10px" id="logout">Logout</button></div>`;
+}
+function back(){showHome()}
+
+function showHome(){
+  root.innerHTML=profileHeader()+`<div class="title">আপনি কোন পরীক্ষার জন্য প্রস্তুতি নিচ্ছেন?</div>
+  <div class="desc">একটি option নির্বাচন করুন।</div>
+  <div class="grid">
+    <div class="card" onclick="selectAdmission()"><div class="icon">🎓</div><div class="name">University Admission</div><div class="small">DU • RU • NU • KU • GST</div></div>
+    <div class="card" onclick="selectAcademic('HSC')"><div class="icon">📚</div><div class="name">HSC</div><div class="small">HSC MCQ</div></div>
+    <div class="card" onclick="selectAcademic('SSC')"><div class="icon">📖</div><div class="name">SSC</div><div class="small">SSC MCQ</div></div>
+  </div>`;
+  document.getElementById("logout").onclick=()=>signOut(auth);
+}
+
+window.selectAdmission=async()=>{
+  root.innerHTML=loading("University loading...");
+  try{
+    const d=await api({action:"groups"}); groups=d.groups.filter(x=>["DU","RU","NU","KU","GST"].includes(x["Group ID"]));
+    root.innerHTML=`<button class="back" onclick="showHome()">← Back</button><div class="title">🎓 University Admission</div><div class="desc">University নির্বাচন করুন</div><div class="grid">${groups.map(g=>`<div class="card" onclick="pickGroup('${esc(g["Group ID"])}')"><div class="icon">🏛️</div><div class="name">${esc(g.Name||g["Group ID"])}</div><div class="small">${esc(g["Group ID"])}</div></div>`).join("")}</div>`;
+  }catch(e){root.innerHTML=`<div class="error">${esc(e.message)}</div>`}
+};
+
+window.pickGroup=async id=>{
+  state={examType:"Admission",groupId:id,unit:"",category:"",year:"",subject:""};
+  root.innerHTML=loading("Unit loading...");
+  try{
+    const d=await api({action:"units",examType:"Admission",groupId:id}); units=d.units;
+    root.innerHTML=`<button class="back" onclick="selectAdmission()">← Back</button><div class="title">${esc(id)} — Unit</div><div class="desc">প্রথমে Unit নির্বাচন করুন</div>
+    <div class="card" onclick="startTest({examType:'Admission',groupId:'${esc(id)}'})"><div class="icon">🔥</div><div class="name">First Test Now</div><div class="small">Random MCQ</div></div>
+    <div class="grid">${units.map(u=>`<div class="card" onclick="pickUnit('${esc(u)}')"><div class="icon">📘</div><div class="name">Unit ${esc(u)}</div></div>`).join("")}</div>`;
+  }catch(e){root.innerHTML=`<div class="error">${esc(e.message)}</div>`}
+};
+
+window.pickUnit=async u=>{
+  state.unit=u; root.innerHTML=loading("Category loading...");
+  try{
+    const d=await api({action:"categories",examType:"Admission",groupId:state.groupId,unit:u}); categories=d.categories;
+    root.innerHTML=`<button class="back" onclick="pickGroup('${esc(state.groupId)}')">← Back</button><div class="title">Unit ${esc(u)}</div><div class="desc">Science / Arts / Commerce নির্বাচন করুন</div>
+    <div class="grid">${categories.map(c=>`<div class="card" onclick="pickCategory('${esc(c)}')"><div class="icon">${c==="Science"?"🔬":c==="Arts"?"🎨":c==="Commerce"?"💼":"📚"}</div><div class="name">${esc(c)}</div></div>`).join("")}</div>`;
+  }catch(e){root.innerHTML=`<div class="error">${esc(e.message)}</div>`}
+};
+
+window.pickCategory=async c=>{
+  state.category=c; root.innerHTML=loading("Year loading...");
+  try{
+    const d=await api({action:"years",examType:"Admission",groupId:state.groupId,unit:state.unit,category:c}); years=d.years;
+    renderYears(years,()=>pickCategory(state.category), "Admission");
+  }catch(e){root.innerHTML=`<div class="error">${esc(e.message)}</div>`}
+};
+
+window.selectAcademic=async type=>{
+  state={examType:type,groupId:type,unit:"",category:"",year:"",subject:""}; root.innerHTML=loading("Year loading...");
+  try{
+    const d=await api({action:"years",examType:type,groupId:type}); years=d.years;
+    renderYears(years,()=>showHome(),type);
+  }catch(e){root.innerHTML=`<div class="error">${esc(e.message)}</div>`}
+};
+
+function renderYears(list,backFn,type){
+  root.innerHTML=`<button class="back" id="back">← Back</button><div class="title">${type==="Admission"?esc(state.groupId):type}</div><div class="desc">Year নির্বাচন করুন</div>
+  <div class="card" onclick="startTest({examType:'${esc(state.examType)}',groupId:'${esc(state.groupId)}',unit:'${esc(state.unit)}',category:'${esc(state.category)}'})"><div class="icon">🔥</div><div class="name">First Test Now</div><div class="small">Random MCQ</div></div>
+  ${list.length?list.map(y=>`<div class="card" onclick="pickYear('${esc(y)}')"><div class="name">📅 ${esc(type)} ${esc(y)}</div><div class="small">MCQ available</div></div>`).join(""):`<div class="desc">কোনো Year পাওয়া যায়নি।</div>`}`;
+  document.getElementById("back").onclick=backFn;
+}
+window.pickYear=async y=>{
+  state.year=y; root.innerHTML=loading("Subjects loading...");
+  try{
+    const d=await api({action:"subjects",examType:state.examType,groupId:state.groupId,year:y,unit:state.unit,category:state.category}); 
+    const subs=d.subjects;
+    root.innerHTML=`<button class="back" onclick="selectAcademic('${esc(state.examType)}')">← Back</button><div class="title">${esc(state.year)}</div><div class="desc">Subject নির্বাচন করুন অথবা random test দিন</div>
+    <div class="card" onclick="startTest({examType:'${esc(state.examType)}',groupId:'${esc(state.groupId)}',year:'${esc(state.year)}',unit:'${esc(state.unit)}',category:'${esc(state.category)}'})"><div class="icon">🔥</div><div class="name">First Test Now</div><div class="small">Random MCQ</div></div>
+    <div class="grid">${subs.map(s=>`<div class="card" onclick="startTest({examType:'${esc(state.examType)}',groupId:'${esc(state.groupId)}',year:'${esc(state.year)}',unit:'${esc(state.unit)}',category:'${esc(state.category)}',subject:'${esc(s)}'})"><div class="icon">📚</div><div class="name">${esc(s)}</div></div>`).join("")}</div>`;
+  }catch(e){root.innerHTML=`<div class="error">${esc(e.message)}</div>`}
+};
+
+window.startTest=async p=>{
+  state={...state,...p};
+  await saveAccount();
+  root.innerHTML=loading("MCQ loading...");
+  try{
+    const d=await api({action:"random",count:"20",...p}); questions=d.questions||[];
+    if(!questions.length) throw new Error("এই selection-এর কোনো MCQ পাওয়া যায়নি।");
+    qi=0;selected={}; renderQuestion();
+  }catch(e){root.innerHTML=`<div class="error">${esc(e.message)}</div>`}
+};
+function renderQuestion(){
+  const q=questions[qi];
+  const opts=["A","B","C","D"];
+  root.innerHTML=`<button class="back" onclick="showHome()">← Home</button><div class="desc">Question ${qi+1} / ${questions.length}</div>
+  <div class="test"><div class="q">${esc(q.Question)}</div>${opts.map(o=>`<div class="opt ${selected[qi]===o?"sel":""}" onclick="answer('${o}')"><b>${o}</b>&nbsp; ${esc(q["Option "+o])}</div>`).join("")}
+  <div class="actions">${qi?`<button class="secondary" onclick="prev()">← Previous</button>`:""}${qi<questions.length-1?`<button class="primary" onclick="next()">Next →</button>`:`<button class="primary" onclick="finish()">Submit ✓</button>`}</div></div>`;
+}
+window.answer=o=>{selected[qi]=o;renderQuestion()}; window.next=()=>{qi++;renderQuestion()}; window.prev=()=>{qi--;renderQuestion()};
+window.finish=()=>{
+  let c=0,w=0,s=0;questions.forEach((q,i)=>{if(!selected[i])s++;else if(selected[i].toUpperCase()===String(q.Answer).trim().toUpperCase())c++;else w++});
+  const pct=Math.round(c/questions.length*100);
+  root.innerHTML=`<div class="card" style="text-align:center"><div class="icon">🏆</div><div class="title">${pct}%</div><div class="desc">Correct: ${c} • Wrong: ${w} • Skipped: ${s}</div><button class="primary" onclick="showHome()">Back to Home</button></div>`;
+};
+
+onAuthStateChanged(auth, async u=>{
+  user=u;
+  if(!u){loginScreen();return}
+  profile=await getAccount();
+  if(profile){
+    state={examType:profile.examType||"",groupId:profile.groupId||"",unit:profile.unit||"",category:profile.category||"",year:profile.year||"",subject:""};
+    showHome();
+  }else {
+    state={examType:"",groupId:"",unit:"",category:"",year:"",subject:""};
+    await saveAccount();
+    showHome();
+  }
+});
+</script>
+</body>
+</html>
