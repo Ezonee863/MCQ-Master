@@ -1,218 +1,765 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MCQ Master</title>
-<style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,"Noto Sans Bengali",sans-serif;background:#f4f6f9;color:#172033}
-.app{max-width:720px;margin:auto;min-height:100vh;background:#f4f6f9}
-.header{padding:22px 18px;background:linear-gradient(135deg,#101828,#344054);color:#fff;border-radius:0 0 24px 24px}
-.logo{font-size:25px;font-weight:800}.sub{font-size:13px;opacity:.75;margin-top:5px}
-.main{padding:20px 16px 40px}.title{font-size:23px;font-weight:800;margin-bottom:7px}.desc{color:#667085;font-size:14px;margin-bottom:18px}
-.card{background:#fff;border:1px solid #e4e7ec;border-radius:18px;padding:18px;margin:12px 0;box-shadow:0 4px 16px #1018280d;cursor:pointer}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.grid .card{margin:0}
-.icon{font-size:30px;margin-bottom:12px}.name{font-weight:800;font-size:16px}.small{font-size:12px;color:#667085;margin-top:5px}
-.primary{background:#101828;color:#fff;border:0;border-radius:14px;padding:14px 18px;font-weight:800;width:100%;font-size:15px}
-.secondary{background:#fff;border:1px solid #d0d5dd;border-radius:14px;padding:13px 18px;font-weight:700;width:100%;font-size:15px}
-.login{margin-top:35px}.profile{background:#fff;border:1px solid #e4e7ec;border-radius:18px;padding:16px;display:flex;align-items:center;gap:12px;margin-bottom:20px}
-.avatar{width:48px;height:48px;border-radius:50%;background:#eaecf0;object-fit:cover}.loading{text-align:center;padding:50px;color:#667085}.spinner{width:34px;height:34px;border:4px solid #e4e7ec;border-top-color:#344054;border-radius:50%;margin:0 auto 12px;animation:s 1s linear infinite}@keyframes s{to{transform:rotate(360deg)}}
-.back{background:#fff;border:1px solid #d0d5dd;border-radius:12px;padding:10px 14px;margin-bottom:16px;font-weight:700}
-.error{background:#fff1f3;color:#c01048;border:1px solid #fecdca;padding:14px;border-radius:14px}
-.selected{border:2px solid #101828;background:#f8f9fc}
-.test{background:#fff;border-radius:18px;border:1px solid #e4e7ec;padding:18px}.q{font-size:19px;font-weight:700;line-height:1.6}.opt{border:1px solid #d0d5dd;border-radius:13px;padding:14px;margin-top:10px;cursor:pointer}.opt.sel{background:#eef2ff;border-color:#344054}.actions{display:flex;gap:10px;margin-top:16px}.actions button{flex:1}
-@media(max-width:430px){.grid{grid-template-columns:1fr 1fr}.title{font-size:21px}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCQ Master</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4f46e5',
+            secondary: '#7c3aed',
+            accent: '#06b6d4'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .fade-in { animation: fadeIn 0.3s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .option-btn { transition: all 0.2s; }
+    .option-btn:hover:not(:disabled) { transform: translateX(4px); }
+    .loader { border: 3px solid #f3f3f3; border-top: 3px solid #4f46e5; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .glass { background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); }
+    .dark .glass { background: rgba(17,24,39,0.8); }
+  </style>
 </head>
-<body>
-<div class="app">
-  <header class="header">
-    <div class="logo">MCQ Master</div>
-    <div class="sub">University Admission • HSC • SSC</div>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen transition-colors duration-300">
+
+  <!-- CONFIG: Paste your GAS Web App URL here -->
+  <script>
+    const API_BASE = "https://script.google.com/macros/s/AKfycbx2dLQmC4XMKxBb3RViSahsEmAZIYvZU2Pbwu7FS7588n5Z1dZTHZbMbsrHNHsx5Qat/exec";
+    // Example: const API_BASE = "https://script.google.com/macros/s/AKfycb.../exec";
+  </script>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+  <!-- Header -->
+  <header class="glass sticky top-0 z-40 border-b border-gray-200 dark:border-gray-700">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
+            <i class="fas fa-graduation-cap"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">MCQ Master</h1>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Admission Test Prep</p>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <button onclick="toggleDark()" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+            <i class="fas fa-moon dark:hidden"></i>
+            <i class="fas fa-sun hidden dark:block"></i>
+          </button>
+          <button onclick="openProfile()" class="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition shadow-md">
+            <i class="fas fa-user"></i>
+            <span class="hidden sm:inline">Profile</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </header>
-  <main class="main" id="app"><div class="loading"><div class="spinner"></div>Loading...</div></main>
-</div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+  <!-- Connection Status -->
+  <div id="connStatus" class="hidden">
+    <div class="max-w-7xl mx-auto px-4 pt-4">
+      <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 flex items-center gap-3">
+        <i class="fas fa-exclamation-circle text-red-500"></i>
+        <span class="text-sm text-red-700 dark:text-red-300">API not connected. Please set your <code>API_BASE</code> URL in the HTML source.</span>
+      </div>
+    </div>
+  </div>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAc7uBUZXlVWY9wfwUIf3sk8gGVrECqtRs",
-  authDomain: "call-app-d1a8b.firebaseapp.com",
-  databaseURL: "https://call-app-d1a8b-default-rtdb.firebaseio.com",
-  projectId: "call-app-d1a8b",
-  storageBucket: "call-app-d1a8b.firebasestorage.app",
-  messagingSenderId: "30464821298",
-  appId: "1:30464821298:web:e4e61a7968f6551603942b"
-};
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    
+    <!-- Navigation Tabs -->
+    <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+      <button onclick="setMode('dashboard')" id="tab-dashboard" class="tab-btn px-4 py-2 rounded-lg font-medium transition bg-primary text-white shadow-md">
+        <i class="fas fa-chart-pie mr-2"></i>Dashboard
+      </button>
+      <button onclick="setMode('browse')" id="tab-browse" class="tab-btn px-4 py-2 rounded-lg font-medium transition bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+        <i class="fas fa-book mr-2"></i>Browse
+      </button>
+      <button onclick="setMode('quiz')" id="tab-quiz" class="tab-btn px-4 py-2 rounded-lg font-medium transition bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+        <i class="fas fa-clipboard-check mr-2"></i>Quiz
+      </button>
+      <button onclick="setMode('random')" id="tab-random" class="tab-btn px-4 py-2 rounded-lg font-medium transition bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+        <i class="fas fa-shuffle mr-2"></i>Random
+      </button>
+    </div>
 
-const API = "https://script.google.com/macros/s/AKfycbzvsbNTumqdAFj9QDSc6z8WNBEvJ3xKGlRr57RXLj31FOkgAxkXXONncfas1uDImJVggg/exec";
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
-const root = document.getElementById("app");
+    <!-- Filters Panel -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-semibold text-lg"><i class="fas fa-filter mr-2 text-primary"></i>Filters</h2>
+        <button onclick="clearFilters()" class="text-sm text-primary hover:text-primary/80 font-medium">Clear All</button>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div>
+          <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Exam Type</label>
+          <select id="f-examType" onchange="onFilterChange()" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
+            <option value="">All</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Group</label>
+          <select id="f-groupId" onchange="onFilterChange()" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
+            <option value="">All</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Year</label>
+          <select id="f-year" onchange="onFilterChange()" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
+            <option value="">All</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Unit</label>
+          <select id="f-unit" onchange="onFilterChange()" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
+            <option value="">All</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Category</label>
+          <select id="f-category" onchange="onFilterChange()" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
+            <option value="">All</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Subject</label>
+          <select id="f-subject" onchange="onFilterChange()" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none">
+            <option value="">All</option>
+          </select>
+        </div>
+      </div>
+    </div>
 
-let user = null, profile = null, groups = [], years = [], units = [], categories = [], questions = [];
-let state = {examType:"", groupId:"", unit:"", category:"", year:"", subject:""};
-let qi=0, selected={};
+    <!-- Dashboard Mode -->
+    <div id="mode-dashboard" class="fade-in">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400">Total Questions</p>
+              <p id="stat-total" class="text-2xl font-bold text-primary">-</p>
+            </div>
+            <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary"><i class="fas fa-database"></i></div>
+          </div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400">Groups</p>
+              <p id="stat-groups" class="text-2xl font-bold text-secondary">-</p>
+            </div>
+            <div class="w-10 h-10 bg-secondary/10 rounded-lg flex items-center justify-center text-secondary"><i class="fas fa-layer-group"></i></div>
+          </div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400">Subjects</p>
+              <p id="stat-subjects" class="text-2xl font-bold text-accent">-</p>
+            </div>
+            <div class="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center text-accent"><i class="fas fa-book"></i></div>
+          </div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400">Years</p>
+              <p id="stat-years" class="text-2xl font-bold text-emerald-500">-</p>
+            </div>
+            <div class="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center text-emerald-500"><i class="fas fa-calendar"></i></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-gradient-to-br from-primary to-secondary rounded-2xl p-8 text-white text-center">
+        <h2 class="text-2xl font-bold mb-2">Ready to Practice?</h2>
+        <p class="mb-6 opacity-90">Select filters above and switch to Quiz or Random mode to start.</p>
+        <div class="flex justify-center gap-3">
+          <button onclick="setMode('quiz')" class="px-6 py-3 bg-white text-primary rounded-xl font-semibold hover:bg-gray-100 transition shadow-lg">
+            <i class="fas fa-play mr-2"></i>Start Quiz
+          </button>
+          <button onclick="setMode('random')" class="px-6 py-3 bg-white/20 text-white rounded-xl font-semibold hover:bg-white/30 transition">
+            <i class="fas fa-shuffle mr-2"></i>Random Practice
+          </button>
+        </div>
+      </div>
+    </div>
 
-const esc = s => String(s ?? "").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
-const loading = t => `<div class="loading"><div class="spinner"></div>${esc(t)}</div>`;
+    <!-- Browse Mode -->
+    <div id="mode-browse" class="hidden fade-in">
+      <div class="flex justify-between items-center mb-4">
+        <p id="browse-count" class="text-sm text-gray-500 dark:text-gray-400">Loading...</p>
+        <div class="flex gap-2">
+          <button onclick="changePage(-1)" id="btn-prev" class="px-3 py-1 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 text-sm">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <span id="page-info" class="px-3 py-1 text-sm font-medium">Page 1</span>
+          <button onclick="changePage(1)" id="btn-next" class="px-3 py-1 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 text-sm">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+      <div id="questions-list" class="space-y-4"></div>
+    </div>
 
-async function api(params){
-  const r = await fetch(API+"?"+new URLSearchParams(params));
-  const d = await r.json();
-  if(!d.success) throw new Error(d.error||"API error");
-  return d;
-}
+    <!-- Quiz Mode -->
+    <div id="mode-quiz" class="hidden fade-in">
+      <div id="quiz-setup" class="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <h3 class="text-lg font-bold mb-4 text-center">Quiz Settings</h3>
+        <div class="mb-4">
+          <label class="block text-sm font-medium mb-2">Number of Questions</label>
+          <input type="number" id="quiz-count" value="20" min="1" max="100" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 outline-none focus:ring-2 focus:ring-primary">
+        </div>
+        <button onclick="startQuiz()" class="w-full py-3 bg-primary hover:bg-primary/90 text-white rounded-xl font-semibold transition shadow-lg">
+          Start Quiz
+        </button>
+      </div>
+      
+      <div id="quiz-active" class="hidden max-w-3xl mx-auto">
+        <div class="flex justify-between items-center mb-4 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+          <span class="text-sm font-medium">Question <span id="q-current">1</span> / <span id="q-total">20</span></span>
+          <div class="flex items-center gap-2">
+            <i class="fas fa-clock text-gray-400"></i>
+            <span id="quiz-timer" class="font-mono font-bold text-primary">00:00</span>
+          </div>
+          <span class="text-sm font-medium">Score: <span id="q-score" class="text-primary font-bold">0</span></span>
+        </div>
+        
+        <div id="quiz-question-card" class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-4">
+          <div class="mb-2">
+            <span id="q-meta" class="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md text-gray-500 dark:text-gray-400"></span>
+          </div>
+          <h3 id="q-text" class="text-lg font-semibold mb-6 leading-relaxed"></h3>
+          <div id="q-options" class="space-y-3"></div>
+        </div>
+        
+        <div class="flex justify-between">
+          <button onclick="endQuiz()" class="px-4 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition text-sm font-medium">End Quiz</button>
+          <button onclick="nextQuestion()" id="btn-next-q" class="px-6 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition font-medium hidden">Next</button>
+        </div>
+      </div>
+      
+      <div id="quiz-result" class="hidden max-w-md mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 text-center">
+        <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 text-primary text-3xl">
+          <i class="fas fa-trophy"></i>
+        </div>
+        <h3 class="text-2xl font-bold mb-2">Quiz Complete!</h3>
+        <p class="text-gray-500 dark:text-gray-400 mb-6">You scored <span id="final-score" class="text-primary font-bold text-xl"></span> out of <span id="final-total"></span></p>
+        <div class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+          Time: <span id="final-time" class="font-mono font-medium"></span>
+        </div>
+        <button onclick="setMode('dashboard')" class="w-full py-3 bg-primary hover:bg-primary/90 text-white rounded-xl font-semibold transition">Back to Dashboard</button>
+      </div>
+    </div>
 
-/* Account POST is intentionally kept here; Apps Script doPost handles it.
-   If GitHub Pages blocks a cross-origin POST in a browser, the next backend
-   revision will use a GET-safe account endpoint. */
-async function saveAccount(){
-  if(!user?.email) return null;
-  const p={action:"saveAccount",email:user.email,name:user.displayName||"",
-    examType:state.examType||"",groupId:state.groupId||"",unit:state.unit||"",
-    category:state.category||"",year:state.year||""};
-  try{return await api(p)}catch(e){console.warn("Account save:",e);return null;}
-}
-async function getAccount(){
-  try{
-    const d=await api({action:"getAccount",email:user.email});
-    return d.found ? d.account : null;
-  }catch(e){console.warn(e);return null;}
-}
+    <!-- Random Mode -->
+    <div id="mode-random" class="hidden fade-in">
+      <div class="max-w-3xl mx-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="font-bold text-lg">Random Practice</h3>
+          <button onclick="loadRandom()" class="px-4 py-2 bg-secondary hover:bg-secondary/90 text-white rounded-lg transition text-sm font-medium">
+            <i class="fas fa-refresh mr-2"></i>New Set
+          </button>
+        </div>
+        <div id="random-list" class="space-y-4"></div>
+      </div>
+    </div>
 
-function loginScreen(){
-  root.innerHTML=`<div class="title">MCQ Master-এ স্বাগতম 👋</div>
-  <div class="desc">প্রথমে Google Account দিয়ে Sign in করুন। আপনার password আমরা সংরক্ষণ করি না।</div>
-  <div class="card login">
-    <div class="icon">🔐</div><div class="name">Google Account</div>
-    <div class="small">আপনার profile ও test progress-এর জন্য account প্রয়োজন।</div>
-    <br><button class="primary" id="googleBtn">Continue with Google</button>
-  </div>`;
-  document.getElementById("googleBtn").onclick=async()=>{
-    try{await signInWithPopup(auth,provider)}catch(e){root.innerHTML+=`<div class="error">Google Login Error: ${esc(e.message)}</div>`}
-  };
-}
+  </main>
 
-function profileHeader(){
-  return `<div class="profile">${user.photoURL?`<img class="avatar" src="${esc(user.photoURL)}">`:`<div class="avatar"></div>`}
-  <div style="flex:1"><b>${esc(user.displayName||"User")}</b><div class="small">${esc(user.email)}</div></div>
-  <button class="secondary" style="width:auto;padding:8px 10px" id="logout">Logout</button></div>`;
-}
-function back(){showHome()}
+  <!-- Profile Modal -->
+  <div id="profile-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 fade-in">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-bold">Your Profile</h3>
+        <button onclick="closeProfile()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"><i class="fas fa-times text-xl"></i></button>
+      </div>
+      <form onsubmit="saveProfile(event)" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">Email *</label>
+          <input type="email" id="p-email" required class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 outline-none focus:ring-2 focus:ring-primary">
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Name</label>
+          <input type="text" id="p-name" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 outline-none focus:ring-2 focus:ring-primary">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium mb-1">Exam Type</label>
+            <input type="text" id="p-examType" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 outline-none focus:ring-2 focus:ring-primary">
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Group</label>
+            <input type="text" id="p-groupId" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 outline-none focus:ring-2 focus:ring-primary">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium mb-1">Unit</label>
+            <input type="text" id="p-unit" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 outline-none focus:ring-2 focus:ring-primary">
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Year</label>
+            <input type="text" id="p-year" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 outline-none focus:ring-2 focus:ring-primary">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Category</label>
+          <input type="text" id="p-category" class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 outline-none focus:ring-2 focus:ring-primary">
+        </div>
+        <button type="submit" class="w-full py-3 bg-primary hover:bg-primary/90 text-white rounded-xl font-semibold transition shadow-lg">
+          Save Profile
+        </button>
+      </form>
+      <div id="profile-info" class="hidden mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-sm text-green-700 dark:text-green-300"></div>
+    </div>
+  </div>
 
-function showHome(){
-  root.innerHTML=profileHeader()+`<div class="title">আপনি কোন পরীক্ষার জন্য প্রস্তুতি নিচ্ছেন?</div>
-  <div class="desc">একটি option নির্বাচন করুন।</div>
-  <div class="grid">
-    <div class="card" onclick="selectAdmission()"><div class="icon">🎓</div><div class="name">University Admission</div><div class="small">DU • RU • NU • KU • GST</div></div>
-    <div class="card" onclick="selectAcademic('HSC')"><div class="icon">📚</div><div class="name">HSC</div><div class="small">HSC MCQ</div></div>
-    <div class="card" onclick="selectAcademic('SSC')"><div class="icon">📖</div><div class="name">SSC</div><div class="small">SSC MCQ</div></div>
-  </div>`;
-  document.getElementById("logout").onclick=()=>signOut(auth);
-}
+  <script>
+    // ========== STATE ==========
+    let currentMode = 'dashboard';
+    let filters = { examType:'', groupId:'', year:'', unit:'', category:'', subject:'' };
+    let currentPage = 1;
+    let questionsCache = [];
+    let quizData = [];
+    let quizIndex = 0;
+    let quizScore = 0;
+    let quizAnswers = {};
+    let quizStartTime = null;
+    let timerInterval = null;
+    let userAccount = null;
 
-window.selectAdmission=async()=>{
-  root.innerHTML=loading("University loading...");
-  try{
-    const d=await api({action:"groups"}); groups=d.groups.filter(x=>["DU","RU","NU","KU","GST"].includes(x["Group ID"]));
-    root.innerHTML=`<button class="back" onclick="showHome()">← Back</button><div class="title">🎓 University Admission</div><div class="desc">University নির্বাচন করুন</div><div class="grid">${groups.map(g=>`<div class="card" onclick="pickGroup('${esc(g["Group ID"])}')"><div class="icon">🏛️</div><div class="name">${esc(g.Name||g["Group ID"])}</div><div class="small">${esc(g["Group ID"])}</div></div>`).join("")}</div>`;
-  }catch(e){root.innerHTML=`<div class="error">${esc(e.message)}</div>`}
-};
+    // ========== INIT ==========
+    document.addEventListener('DOMContentLoaded', () => {
+      if (API_BASE.includes('YOUR_GOOGLE_APPS_SCRIPT')) {
+        document.getElementById('connStatus').classList.remove('hidden');
+        showToast('Please configure API_BASE in the HTML source code', 'error');
+        return;
+      }
+      checkConnection();
+      loadAllFilters();
+      loadStats();
+      
+      // Load saved profile
+      const saved = localStorage.getItem('mcq_profile');
+      if (saved) {
+        const p = JSON.parse(saved);
+        Object.keys(p).forEach(k => { if(filters.hasOwnProperty(k)) filters[k] = p[k]; });
+        populateFilterInputs();
+        if (p.email) loadProfile(p.email);
+      }
+    });
 
-window.pickGroup=async id=>{
-  state={examType:"Admission",groupId:id,unit:"",category:"",year:"",subject:""};
-  root.innerHTML=loading("Unit loading...");
-  try{
-    const d=await api({action:"units",examType:"Admission",groupId:id}); units=d.units;
-    root.innerHTML=`<button class="back" onclick="selectAdmission()">← Back</button><div class="title">${esc(id)} — Unit</div><div class="desc">প্রথমে Unit নির্বাচন করুন</div>
-    <div class="card" onclick="startTest({examType:'Admission',groupId:'${esc(id)}'})"><div class="icon">🔥</div><div class="name">First Test Now</div><div class="small">Random MCQ</div></div>
-    <div class="grid">${units.map(u=>`<div class="card" onclick="pickUnit('${esc(u)}')"><div class="icon">📘</div><div class="name">Unit ${esc(u)}</div></div>`).join("")}</div>`;
-  }catch(e){root.innerHTML=`<div class="error">${esc(e.message)}</div>`}
-};
+    // ========== API ==========
+    async function api(action, params = {}, method = 'GET') {
+      const url = new URL(API_BASE);
+      url.searchParams.set('action', action);
+      Object.entries(params).forEach(([k,v]) => { if(v) url.searchParams.set(k, v); });
+      
+      try {
+        const options = { method };
+        if (method === 'POST') {
+          options.headers = { 'Content-Type': 'application/json' };
+          options.body = JSON.stringify({ action, ...params });
+        }
+        const res = await fetch(url.toString().replace(/[?&]action=[^&]+/, ''), options);
+        // Actually for GET we need query params, for POST we need body. Let me fix:
+      } catch(e) {
+        showToast('Network error: ' + e.message, 'error');
+        throw e;
+      }
+    }
 
-window.pickUnit=async u=>{
-  state.unit=u; root.innerHTML=loading("Category loading...");
-  try{
-    const d=await api({action:"categories",examType:"Admission",groupId:state.groupId,unit:u}); categories=d.categories;
-    root.innerHTML=`<button class="back" onclick="pickGroup('${esc(state.groupId)}')">← Back</button><div class="title">Unit ${esc(u)}</div><div class="desc">Science / Arts / Commerce নির্বাচন করুন</div>
-    <div class="grid">${categories.map(c=>`<div class="card" onclick="pickCategory('${esc(c)}')"><div class="icon">${c==="Science"?"🔬":c==="Arts"?"🎨":c==="Commerce"?"💼":"📚"}</div><div class="name">${esc(c)}</div></div>`).join("")}</div>`;
-  }catch(e){root.innerHTML=`<div class="error">${esc(e.message)}</div>`}
-};
+    async function apiGet(action, params = {}) {
+      const url = new URL(API_BASE);
+      url.searchParams.set('action', action);
+      Object.entries(params).forEach(([k,v]) => { if(v !== '' && v !== null && v !== undefined) url.searchParams.set(k, v); });
+      const res = await fetch(url);
+      return res.json();
+    }
 
-window.pickCategory=async c=>{
-  state.category=c; root.innerHTML=loading("Year loading...");
-  try{
-    const d=await api({action:"years",examType:"Admission",groupId:state.groupId,unit:state.unit,category:c}); years=d.years;
-    renderYears(years,()=>pickCategory(state.category), "Admission");
-  }catch(e){root.innerHTML=`<div class="error">${esc(e.message)}</div>`}
-};
+    async function apiPost(action, params = {}) {
+      const url = new URL(API_BASE);
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, ...params })
+      });
+      return res.json();
+    }
 
-window.selectAcademic=async type=>{
-  state={examType:type,groupId:type,unit:"",category:"",year:"",subject:""}; root.innerHTML=loading("Year loading...");
-  try{
-    const d=await api({action:"years",examType:type,groupId:type}); years=d.years;
-    renderYears(years,()=>showHome(),type);
-  }catch(e){root.innerHTML=`<div class="error">${esc(e.message)}</div>`}
-};
+    async function checkConnection() {
+      try {
+        const data = await apiGet('ping');
+        if (data.success) showToast('Connected to MCQ API', 'success');
+      } catch(e) {
+        showToast('API connection failed', 'error');
+      }
+    }
 
-function renderYears(list,backFn,type){
-  root.innerHTML=`<button class="back" id="back">← Back</button><div class="title">${type==="Admission"?esc(state.groupId):type}</div><div class="desc">Year নির্বাচন করুন</div>
-  <div class="card" onclick="startTest({examType:'${esc(state.examType)}',groupId:'${esc(state.groupId)}',unit:'${esc(state.unit)}',category:'${esc(state.category)}'})"><div class="icon">🔥</div><div class="name">First Test Now</div><div class="small">Random MCQ</div></div>
-  ${list.length?list.map(y=>`<div class="card" onclick="pickYear('${esc(y)}')"><div class="name">📅 ${esc(type)} ${esc(y)}</div><div class="small">MCQ available</div></div>`).join(""):`<div class="desc">কোনো Year পাওয়া যায়নি।</div>`}`;
-  document.getElementById("back").onclick=backFn;
-}
-window.pickYear=async y=>{
-  state.year=y; root.innerHTML=loading("Subjects loading...");
-  try{
-    const d=await api({action:"subjects",examType:state.examType,groupId:state.groupId,year:y,unit:state.unit,category:state.category}); 
-    const subs=d.subjects;
-    root.innerHTML=`<button class="back" onclick="selectAcademic('${esc(state.examType)}')">← Back</button><div class="title">${esc(state.year)}</div><div class="desc">Subject নির্বাচন করুন অথবা random test দিন</div>
-    <div class="card" onclick="startTest({examType:'${esc(state.examType)}',groupId:'${esc(state.groupId)}',year:'${esc(state.year)}',unit:'${esc(state.unit)}',category:'${esc(state.category)}'})"><div class="icon">🔥</div><div class="name">First Test Now</div><div class="small">Random MCQ</div></div>
-    <div class="grid">${subs.map(s=>`<div class="card" onclick="startTest({examType:'${esc(state.examType)}',groupId:'${esc(state.groupId)}',year:'${esc(state.year)}',unit:'${esc(state.unit)}',category:'${esc(state.category)}',subject:'${esc(s)}'})"><div class="icon">📚</div><div class="name">${esc(s)}</div></div>`).join("")}</div>`;
-  }catch(e){root.innerHTML=`<div class="error">${esc(e.message)}</div>`}
-};
+    // ========== FILTERS ==========
+    async function loadAllFilters() {
+      try {
+        const [groups, years, units, categories, subjects] = await Promise.all([
+          apiGet('groups', filters),
+          apiGet('years', filters),
+          apiGet('units', filters),
+          apiGet('categories', filters),
+          apiGet('subjects', filters)
+        ]);
+        populateSelect('f-groupId', groups.groups);
+        populateSelect('f-year', years.years);
+        populateSelect('f-unit', units.units);
+        populateSelect('f-category', categories.categories);
+        populateSelect('f-subject', subjects.subjects);
+      } catch(e) { console.error(e); }
+    }
 
-window.startTest=async p=>{
-  state={...state,...p};
-  await saveAccount();
-  root.innerHTML=loading("MCQ loading...");
-  try{
-    const d=await api({action:"random",count:"20",...p}); questions=d.questions||[];
-    if(!questions.length) throw new Error("এই selection-এর কোনো MCQ পাওয়া যায়নি।");
-    qi=0;selected={}; renderQuestion();
-  }catch(e){root.innerHTML=`<div class="error">${esc(e.message)}</div>`}
-};
-function renderQuestion(){
-  const q=questions[qi];
-  const opts=["A","B","C","D"];
-  root.innerHTML=`<button class="back" onclick="showHome()">← Home</button><div class="desc">Question ${qi+1} / ${questions.length}</div>
-  <div class="test"><div class="q">${esc(q.Question)}</div>${opts.map(o=>`<div class="opt ${selected[qi]===o?"sel":""}" onclick="answer('${o}')"><b>${o}</b>&nbsp; ${esc(q["Option "+o])}</div>`).join("")}
-  <div class="actions">${qi?`<button class="secondary" onclick="prev()">← Previous</button>`:""}${qi<questions.length-1?`<button class="primary" onclick="next()">Next →</button>`:`<button class="primary" onclick="finish()">Submit ✓</button>`}</div></div>`;
-}
-window.answer=o=>{selected[qi]=o;renderQuestion()}; window.next=()=>{qi++;renderQuestion()}; window.prev=()=>{qi--;renderQuestion()};
-window.finish=()=>{
-  let c=0,w=0,s=0;questions.forEach((q,i)=>{if(!selected[i])s++;else if(selected[i].toUpperCase()===String(q.Answer).trim().toUpperCase())c++;else w++});
-  const pct=Math.round(c/questions.length*100);
-  root.innerHTML=`<div class="card" style="text-align:center"><div class="icon">🏆</div><div class="title">${pct}%</div><div class="desc">Correct: ${c} • Wrong: ${w} • Skipped: ${s}</div><button class="primary" onclick="showHome()">Back to Home</button></div>`;
-};
+    function populateSelect(id, items) {
+      const sel = document.getElementById(id);
+      const val = sel.value;
+      sel.innerHTML = '<option value="">All</option>';
+      (items || []).forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item; opt.textContent = item;
+        sel.appendChild(opt);
+      });
+      sel.value = val;
+    }
 
-onAuthStateChanged(auth, async u=>{
-  user=u;
-  if(!u){loginScreen();return}
-  profile=await getAccount();
-  if(profile){
-    state={examType:profile.examType||"",groupId:profile.groupId||"",unit:profile.unit||"",category:profile.category||"",year:profile.year||"",subject:""};
-    showHome();
-  }else {
-    state={examType:"",groupId:"",unit:"",category:"",year:"",subject:""};
-    await saveAccount();
-    showHome();
-  }
-});
-</script>
+    function populateFilterInputs() {
+      Object.keys(filters).forEach(k => {
+        const el = document.getElementById('f-' + k);
+        if (el) el.value = filters[k];
+      });
+    }
+
+    function onFilterChange() {
+      filters.examType = document.getElementById('f-examType').value;
+      filters.groupId = document.getElementById('f-groupId').value;
+      filters.year = document.getElementById('f-year').value;
+      filters.unit = document.getElementById('f-unit').value;
+      filters.category = document.getElementById('f-category').value;
+      filters.subject = document.getElementById('f-subject').value;
+      
+      currentPage = 1;
+      loadAllFilters(); // cascade update
+      loadStats();
+      if (currentMode === 'browse') loadBrowse();
+      if (currentMode === 'random') loadRandom();
+    }
+
+    function clearFilters() {
+      filters = { examType:'', groupId:'', year:'', unit:'', category:'', subject:'' };
+      populateFilterInputs();
+      onFilterChange();
+    }
+
+    // ========== STATS ==========
+    async function loadStats() {
+      try {
+        const data = await apiGet('stats', filters);
+        if (data.success) {
+          document.getElementById('stat-total').textContent = data.stats.totalQuestions;
+          document.getElementById('stat-groups').textContent = data.stats.groups;
+          document.getElementById('stat-subjects').textContent = data.stats.subjects;
+          document.getElementById('stat-years').textContent = data.stats.years;
+        }
+      } catch(e) {}
+    }
+
+    // ========== MODE SWITCHING ==========
+    function setMode(mode) {
+      currentMode = mode;
+      document.querySelectorAll('[id^="mode-"]').forEach(el => el.classList.add('hidden'));
+      document.getElementById('mode-' + mode).classList.remove('hidden');
+      
+      document.querySelectorAll('.tab-btn').forEach(el => {
+        el.classList.remove('bg-primary', 'text-white', 'shadow-md');
+        el.classList.add('bg-white', 'dark:bg-gray-800', 'text-gray-600', 'dark:text-gray-300');
+      });
+      const active = document.getElementById('tab-' + mode);
+      active.classList.remove('bg-white', 'dark:bg-gray-800', 'text-gray-600', 'dark:text-gray-300');
+      active.classList.add('bg-primary', 'text-white', 'shadow-md');
+      
+      if (mode === 'browse') loadBrowse();
+      if (mode === 'random') loadRandom();
+      if (mode === 'quiz') resetQuiz();
+    }
+
+    // ========== BROWSE ==========
+    async function loadBrowse() {
+      const list = document.getElementById('questions-list');
+      list.innerHTML = '<div class="flex justify-center py-8"><div class="loader"></div></div>';
+      try {
+        const data = await apiGet('questions', { ...filters, page: currentPage, limit: 10 });
+        questionsCache = data.questions || [];
+        document.getElementById('browse-count').textContent = `${data.total} questions found`;
+        document.getElementById('page-info').textContent = `Page ${data.page} of ${data.pages || 1}`;
+        document.getElementById('btn-prev').disabled = data.page <= 1;
+        document.getElementById('btn-next').disabled = data.page >= (data.pages || 1);
+        
+        list.innerHTML = '';
+        questionsCache.forEach((q, i) => list.appendChild(createQuestionCard(q, i)));
+      } catch(e) {
+        list.innerHTML = '<p class="text-center text-red-500 py-8">Failed to load questions.</p>';
+      }
+    }
+
+    function changePage(dir) {
+      currentPage += dir;
+      if (currentPage < 1) currentPage = 1;
+      loadBrowse();
+    }
+
+    function createQuestionCard(q, idx) {
+      const div = document.createElement('div');
+      div.className = 'bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5';
+      const meta = [q['Exam Type'], q['Group ID'], q['Year'], q['Unit'], q['Subject']].filter(Boolean).join(' • ');
+      div.innerHTML = `
+        <div class="flex justify-between items-start mb-3">
+          <span class="text-xs px-2 py-1 bg-primary/10 text-primary rounded-md font-medium">#${q['MCQ ID'] || idx+1}</span>
+          <span class="text-xs text-gray-400">${meta}</span>
+        </div>
+        <p class="font-medium mb-4 text-gray-800 dark:text-gray-100">${q['Question']}</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+          ${['A','B','C','D'].map(opt => `
+            <div class="flex items-center gap-2 p-2 rounded-lg border ${q['Answer'] === opt ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 'border-gray-200 dark:border-gray-700'}">
+              <span class="w-6 h-6 rounded-full ${q['Answer'] === opt ? 'bg-green-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'} flex items-center justify-center text-xs font-bold">${opt}</span>
+              <span class="text-sm ${q['Answer'] === opt ? 'text-green-700 dark:text-green-300 font-medium' : 'text-gray-600 dark:text-gray-400'}">${q['Option '+opt]}</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      return div;
+    }
+
+    // ========== QUIZ ==========
+    function resetQuiz() {
+      document.getElementById('quiz-setup').classList.remove('hidden');
+      document.getElementById('quiz-active').classList.add('hidden');
+      document.getElementById('quiz-result').classList.add('hidden');
+      quizScore = 0; quizIndex = 0; quizAnswers = {};
+      if (timerInterval) clearInterval(timerInterval);
+    }
+
+    async function startQuiz() {
+      const count = parseInt(document.getElementById('quiz-count').value) || 20;
+      document.getElementById('quiz-setup').classList.add('hidden');
+      document.getElementById('quiz-active').classList.remove('hidden');
+      
+      try {
+        const data = await apiGet('random', { ...filters, count });
+        quizData = data.questions || [];
+        if (quizData.length === 0) {
+          showToast('No questions found with current filters.', 'error');
+          resetQuiz();
+          return;
+        }
+        quizIndex = 0; quizScore = 0; quizAnswers = {};
+        quizStartTime = Date.now();
+        timerInterval = setInterval(updateTimer, 1000);
+        renderQuestion();
+      } catch(e) {
+        showToast('Failed to load quiz.', 'error');
+        resetQuiz();
+      }
+    }
+
+    function updateTimer() {
+      const elapsed = Math.floor((Date.now() - quizStartTime) / 1000);
+      const m = String(Math.floor(elapsed/60)).padStart(2,'0');
+      const s = String(elapsed%60).padStart(2,'0');
+      document.getElementById('quiz-timer').textContent = `${m}:${s}`;
+    }
+
+    function renderQuestion() {
+      const q = quizData[quizIndex];
+      document.getElementById('q-current').textContent = quizIndex + 1;
+      document.getElementById('q-total').textContent = quizData.length;
+      document.getElementById('q-score').textContent = quizScore;
+      document.getElementById('q-text').textContent = q['Question'];
+      document.getElementById('q-meta').textContent = [q['Group ID'], q['Year'], q['Unit'], q['Subject']].filter(Boolean).join(' • ');
+      document.getElementById('btn-next-q').classList.add('hidden');
+      
+      const optsDiv = document.getElementById('q-options');
+      optsDiv.innerHTML = '';
+      ['A','B','C','D'].forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn w-full text-left p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary dark:hover:border-primary bg-white dark:bg-gray-800 flex items-center gap-3';
+        btn.innerHTML = `<span class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center font-bold text-sm">${opt}</span><span class="text-sm">${q['Option '+opt]}</span>`;
+        btn.onclick = () => selectAnswer(opt, btn);
+        optsDiv.appendChild(btn);
+      });
+    }
+
+    function selectAnswer(opt, btnEl) {
+      const q = quizData[quizIndex];
+      const correct = q['Answer'] === opt;
+      if (correct) quizScore++;
+      
+      quizAnswers[quizIndex] = { selected: opt, correct: q['Answer'] };
+      
+      const buttons = document.getElementById('q-options').children;
+      Array.from(buttons).forEach((b, i) => {
+        b.disabled = true;
+        const letter = ['A','B','C','D'][i];
+        if (letter === q['Answer']) {
+          b.classList.add('border-green-500', 'bg-green-50', 'dark:bg-green-900/20');
+          b.querySelector('span').classList.add('bg-green-500', 'text-white');
+        } else if (letter === opt && !correct) {
+          b.classList.add('border-red-500', 'bg-red-50', 'dark:bg-red-900/20');
+          b.querySelector('span').classList.add('bg-red-500', 'text-white');
+        }
+      });
+      
+      document.getElementById('q-score').textContent = quizScore;
+      document.getElementById('btn-next-q').classList.remove('hidden');
+    }
+
+    function nextQuestion() {
+      quizIndex++;
+      if (quizIndex >= quizData.length) {
+        endQuiz();
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function endQuiz() {
+      if (timerInterval) clearInterval(timerInterval);
+      document.getElementById('quiz-active').classList.add('hidden');
+      document.getElementById('quiz-result').classList.remove('hidden');
+      document.getElementById('final-score').textContent = quizScore;
+      document.getElementById('final-total').textContent = quizData.length;
+      document.getElementById('final-time').textContent = document.getElementById('quiz-timer').textContent;
+    }
+
+    // ========== RANDOM ==========
+    async function loadRandom() {
+      const list = document.getElementById('random-list');
+      list.innerHTML = '<div class="flex justify-center py-8"><div class="loader"></div></div>';
+      try {
+        const data = await apiGet('random', { ...filters, count: 10 });
+        list.innerHTML = '';
+        (data.questions || []).forEach((q, i) => list.appendChild(createQuestionCard(q, i)));
+      } catch(e) {
+        list.innerHTML = '<p class="text-center text-red-500 py-8">Failed to load.</p>';
+      }
+    }
+
+    // ========== PROFILE ==========
+    function openProfile() {
+      document.getElementById('profile-modal').classList.remove('hidden');
+      if (userAccount) fillProfileForm(userAccount);
+    }
+
+    function closeProfile() {
+      document.getElementById('profile-modal').classList.add('hidden');
+    }
+
+    function fillProfileForm(acc) {
+      document.getElementById('p-email').value = acc.email || '';
+      document.getElementById('p-name').value = acc.name || '';
+      document.getElementById('p-examType').value = acc.examType || '';
+      document.getElementById('p-groupId').value = acc.groupId || '';
+      document.getElementById('p-unit').value = acc.unit || '';
+      document.getElementById('p-category').value = acc.category || '';
+      document.getElementById('p-year').value = acc.year || '';
+    }
+
+    async function loadProfile(email) {
+      try {
+        const data = await apiGet('getAccount', { email });
+        if (data.found) {
+          userAccount = data.account;
+          fillProfileForm(userAccount);
+          // Apply to filters
+          if (userAccount.groupId) filters.groupId = userAccount.groupId;
+          if (userAccount.year) filters.year = userAccount.year;
+          if (userAccount.unit) filters.unit = userAccount.unit;
+          if (userAccount.category) filters.category = userAccount.category;
+          if (userAccount.examType) filters.examType = userAccount.examType;
+          if (userAccount.subject) filters.subject = userAccount.subject;
+          populateFilterInputs();
+        }
+      } catch(e) {}
+    }
+
+    async function saveProfile(e) {
+      e.preventDefault();
+      const params = {
+        email: document.getElementById('p-email').value,
+        name: document.getElementById('p-name').value,
+        examType: document.getElementById('p-examType').value,
+        groupId: document.getElementById('p-groupId').value,
+        unit: document.getElementById('p-unit').value,
+        category: document.getElementById('p-category').value,
+        year: document.getElementById('p-year').value
+      };
+      
+      try {
+        const data = await apiPost('saveAccount', params);
+        if (data.success) {
+          userAccount = data.account;
+          localStorage.setItem('mcq_profile', JSON.stringify({
+            email: params.email,
+            groupId: params.groupId,
+            year: params.year,
+            unit: params.unit,
+            category: params.category,
+            examType: params.examType,
+            subject: filters.subject
+          }));
+          document.getElementById('profile-info').textContent = data.existing ? 'Profile updated!' : 'Profile created!';
+          document.getElementById('profile-info').classList.remove('hidden');
+          showToast('Profile saved!', 'success');
+          setTimeout(closeProfile, 1500);
+        }
+      } catch(err) {
+        showToast('Failed to save profile.', 'error');
+      }
+    }
+
+    // ========== UTILS ==========
+    function toggleDark() {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    }
+
+    if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const colors = {
+        success: 'bg-green-500',
+        error: 'bg-red-500',
+        info: 'bg-gray-800'
+      };
+      toast.className = `${colors[type] || colors.info} text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 text-sm font-medium fade-in`;
+      toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check' : type === 'error' ? 'fa-exclamation' : 'fa-info'}"></i> ${msg}`;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 4000);
+    }
+  </script>
 </body>
 </html>
