@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#10b981">
-<title>দক্ষ - প্রস্তুতি ও পরীক্ষা</title>
+<title>MCQ Master - প্রস্তুতি ও পরীক্ষা</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -63,7 +63,7 @@
 <!-- ==================== ONBOARDING FLOW ==================== -->
 <div id="onboarding-view" class="fixed inset-0 z-50 bg-white dark:bg-gray-900 flex flex-col justify-between p-6 max-w-[430px] mx-auto overflow-y-auto no-scrollbar">
   
-  <!-- Step 1: Name Input -->
+  <!-- Step 1: Blank Name + "Already have an account" -->
   <div id="onboard-step-1" class="step-pane flex-1 flex flex-col justify-between py-4">
     <div class="flex flex-col items-center text-center mt-6">
       <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-primary to-emerald-400 flex items-center justify-center text-white text-4xl shadow-xl shadow-primary/30 mb-5 float-logo pulse-glow">
@@ -82,13 +82,80 @@
       </div>
     </div>
 
-    <button onclick="goToOnboardStep(2)" class="w-full py-4 rounded-2xl bg-primary hover:bg-primaryDark text-white font-bold text-base transition shadow-lg shadow-primary/30 flex items-center justify-center gap-2">
-      <span>পরবর্তী ধাপ</span>
-      <i class="fas fa-arrow-right"></i>
-    </button>
+    <div>
+      <button onclick="goToOnboardStep(2)" class="w-full py-4 rounded-2xl bg-primary hover:bg-primaryDark text-white font-bold text-base transition shadow-lg shadow-primary/30 flex items-center justify-center gap-2">
+        <span>পরবর্তী ধাপ</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
+
+      <!-- Already Have an Account Link -->
+      <div class="mt-4 text-center">
+        <span class="text-xs text-gray-500 dark:text-gray-400">ইতিমধ্যে অ্যাকাউন্ট আছে? </span>
+        <button type="button" onclick="showLoginScreen()" class="text-xs text-primary font-bold hover:underline">লগইন করুন (Login)</button>
+      </div>
+    </div>
   </div>
 
-  <!-- Step 2: Class or Preparation Select -->
+  <!-- Step: Re-Login Screen (Already have an Account) -->
+  <div id="onboard-step-login" class="step-pane hidden flex-1 flex flex-col justify-between py-4">
+    <div>
+      <button onclick="goToOnboardStep(1)" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center mb-4">
+        <i class="fas fa-arrow-left text-sm"></i>
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-2xl mx-auto mb-3">
+          <i class="fas fa-right-to-bracket"></i>
+        </div>
+        <h2 class="text-2xl font-extrabold text-gray-800 dark:text-white mb-1">অ্যাকাউন্টে লগইন করুন</h2>
+        <p class="text-xs text-gray-500 dark:text-gray-400">আপনার সংরক্ষিত ইমেইল ও পাসওয়ার্ড দিয়ে প্রবেশ করুন</p>
+      </div>
+
+      <div class="bg-gray-50 dark:bg-gray-800/80 p-5 rounded-2xl border border-gray-200 dark:border-gray-700 space-y-3 mb-4">
+        <div>
+          <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">ইমেইল অ্যাড্রেস</label>
+          <div class="relative">
+            <i class="fas fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+            <input type="email" id="login-email" placeholder="example@gmail.com"
+              class="w-full pl-9 pr-3 py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-xs font-semibold outline-none focus:border-primary text-gray-800 dark:text-white">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">পাসওয়ার্ড</label>
+          <div class="relative">
+            <i class="fas fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+            <input type="password" id="login-password" placeholder="আপনার পাসওয়ার্ড দিন"
+              class="w-full pl-9 pr-10 py-2.5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-xs font-semibold outline-none focus:border-primary text-gray-800 dark:text-white">
+            <button type="button" onclick="togglePassVisibility('login-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <button onclick="handleDirectLogin()" id="btn-direct-login" class="w-full py-3 bg-primary hover:bg-primaryDark text-white rounded-xl font-bold text-xs shadow-md shadow-primary/20 transition flex items-center justify-center gap-2 mt-2">
+          <i class="fas fa-sign-in-alt"></i>
+          <span>লগইন সম্পন্ন করুন</span>
+        </button>
+      </div>
+
+      <div class="relative flex items-center justify-center my-3">
+        <div class="border-t border-gray-200 dark:border-gray-700 w-full"></div>
+        <span class="bg-white dark:bg-gray-900 px-3 text-[10px] font-bold text-gray-400 uppercase">অথবা</span>
+      </div>
+
+      <div class="flex justify-center mb-4">
+        <div id="g_id_signin_login_pane"></div>
+      </div>
+    </div>
+
+    <div class="text-center">
+      <span class="text-xs text-gray-500 dark:text-gray-400">নতুন শিক্ষার্থী? </span>
+      <button onclick="goToOnboardStep(1)" class="text-xs text-primary font-bold hover:underline">নতুন অ্যাকাউন্ট খুলুন</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Preparation Selection -->
   <div id="onboard-step-2" class="step-pane hidden flex-1 flex flex-col justify-between py-4">
     <div>
       <button onclick="goToOnboardStep(1)" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center mb-5">
@@ -154,7 +221,6 @@
         <span id="summary-prep" class="text-[11px] px-2.5 py-0.5 bg-primary text-white font-bold rounded-lg"></span>
       </div>
 
-      <!-- Registration Form -->
       <div class="bg-gray-50 dark:bg-gray-800/70 p-4 rounded-2xl border border-gray-200 dark:border-gray-700 mb-3">
         <h3 class="text-xs font-bold text-gray-700 dark:text-gray-200 mb-2.5 flex items-center gap-1.5">
           <i class="fas fa-shield-alt text-primary"></i>
@@ -162,7 +228,6 @@
         </h3>
 
         <div class="space-y-2.5">
-          <!-- Mobile Number (MANDATORY) -->
           <div>
             <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">
               মোবাইল নম্বর <span class="text-rose-500 font-bold">*বাধ্যতামূলক</span>
@@ -174,7 +239,6 @@
             </div>
           </div>
 
-          <!-- Gmail Address -->
           <div>
             <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">
               ইমেইল অ্যাড্রেস <span class="text-rose-500 font-bold">*যাচাইকরণ কোড যাবে</span>
@@ -186,7 +250,6 @@
             </div>
           </div>
 
-          <!-- Password -->
           <div>
             <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">পাসওয়ার্ড</label>
             <div class="relative">
@@ -206,13 +269,11 @@
         </div>
       </div>
 
-      <!-- Divider -->
       <div class="relative flex items-center justify-center my-2">
         <div class="border-t border-gray-200 dark:border-gray-700 w-full"></div>
         <span class="bg-white dark:bg-gray-900 px-3 text-[10px] font-bold text-gray-400 uppercase">অথবা Google দিয়ে</span>
       </div>
 
-      <!-- Google Sign In Button -->
       <div class="flex flex-col items-center justify-center mb-1">
         <div id="g_id_signin_onboard" class="w-full flex justify-center"></div>
       </div>
@@ -249,7 +310,6 @@
           class="w-full py-3.5 text-center text-2xl tracking-[10px] font-mono font-bold rounded-xl bg-white dark:bg-gray-900 border-2 border-primary outline-none text-gray-800 dark:text-white">
       </div>
 
-      <!-- Diagnostic Helper Box (Displayed if mail delivery has network notice) -->
       <div id="otp-diagnostic-box" class="hidden p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl mb-3 text-center">
         <div class="text-xs text-amber-800 dark:text-amber-200 font-bold mb-1">সার্ভার নোটিশ</div>
         <div id="otp-diagnostic-text" class="text-[11px] text-gray-600 dark:text-gray-300 mb-2"></div>
@@ -275,7 +335,7 @@
 
 <!-- ==================== MAIN APPLICATION ==================== -->
 <main id="main-content" class="pb-24 pt-4 px-4 overflow-y-auto h-[100dvh] no-scrollbar">
-  <!-- Injected dynamically -->
+  <!-- Dynamic Injection -->
 </main>
 
 <!-- ==================== BOTTOM NAV ==================== -->
@@ -304,6 +364,95 @@
   </div>
 </nav>
 
+<!-- ==================== EXAM TIME SETUP MODAL (10, 20, 30, 40, 60 MIN) ==================== -->
+<div id="exam-time-modal" class="hidden fixed inset-0 z-[85] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+  <div class="bg-white dark:bg-gray-800 rounded-t-3xl sm:rounded-3xl p-6 max-w-[430px] w-full shadow-2xl border border-gray-100 dark:border-gray-700 slide-up">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-extrabold text-base text-gray-800 dark:text-white flex items-center gap-2">
+        <i class="fas fa-stopwatch text-primary"></i>
+        <span>পরীক্ষার সময় ও সেটআপ</span>
+      </h3>
+      <button onclick="closeExamTimeModal()" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 flex items-center justify-center">
+        <i class="fas fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="bg-primary/10 rounded-2xl p-3 mb-4 flex items-center justify-between">
+      <div>
+        <div class="text-[10px] uppercase font-bold text-gray-500">পরীক্ষার বিষয় / ধরন</div>
+        <div id="setup-exam-title" class="text-xs font-bold text-gray-800 dark:text-white truncate">বিষয়ভিত্তিক পরীক্ষা</div>
+      </div>
+      <div class="text-right">
+        <div class="text-[10px] uppercase font-bold text-gray-500">ফি (Cost)</div>
+        <div class="text-xs font-black text-primary">১ ক্রেডিট 💎</div>
+      </div>
+    </div>
+
+    <!-- Duration Selection -->
+    <div class="mb-5">
+      <label class="block text-xs font-bold uppercase text-gray-600 dark:text-gray-300 mb-2">পরীক্ষার সময় নির্ধারণ করুন:</label>
+      <div class="grid grid-cols-5 gap-1.5 mb-3" id="time-options-grid">
+        <button type="button" onclick="selectExamTime(10)" data-time="10" class="time-btn py-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 text-xs font-bold text-gray-700 dark:text-gray-300 transition">১০ মি.</button>
+        <button type="button" onclick="selectExamTime(20)" data-time="20" class="time-btn py-2 rounded-xl border-2 border-primary bg-primary text-white text-xs font-bold transition">২০ মি.</button>
+        <button type="button" onclick="selectExamTime(30)" data-time="30" class="time-btn py-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 text-xs font-bold text-gray-700 dark:text-gray-300 transition">৩০ মি.</button>
+        <button type="button" onclick="selectExamTime(40)" data-time="40" class="time-btn py-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 text-xs font-bold text-gray-700 dark:text-gray-300 transition">৪০ মি.</button>
+        <button type="button" onclick="selectExamTime(60)" data-time="60" class="time-btn py-2 rounded-xl border-2 border-gray-200 dark:border-gray-700 text-xs font-bold text-gray-700 dark:text-gray-300 transition">৬০ মি.</button>
+      </div>
+
+      <!-- Stepper for Increase / Decrease -->
+      <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-700">
+        <span class="text-xs font-bold text-gray-600 dark:text-gray-300">সময় পরিবর্তন (±১০ মিনিট):</span>
+        <div class="flex items-center gap-3">
+          <button type="button" onclick="stepExamTime(-10)" class="w-8 h-8 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-100 flex items-center justify-center text-sm shadow-sm">-</button>
+          <span id="display-selected-time" class="font-mono font-black text-sm text-primary">২০ মিনিট</span>
+          <button type="button" onclick="stepExamTime(10)" class="w-8 h-8 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-100 flex items-center justify-center text-sm shadow-sm">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirm and Start Button -->
+    <button onclick="confirmAndStartQuiz()" class="w-full py-3.5 bg-primary hover:bg-primaryDark text-white font-bold rounded-2xl shadow-lg shadow-primary/30 transition flex items-center justify-center gap-2">
+      <i class="fas fa-play"></i>
+      <span>১ ক্রেডিট কেটে পরীক্ষা শুরু করুন</span>
+    </button>
+  </div>
+</div>
+
+<!-- ==================== INSUFFICIENT BALANCE MODAL ==================== -->
+<div id="balance-modal" class="hidden fixed inset-0 z-[95] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+  <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl border border-gray-100 dark:border-gray-700 slide-up">
+    <div class="w-16 h-16 rounded-2xl bg-rose-100 dark:bg-rose-950/40 text-rose-500 text-3xl flex items-center justify-center mx-auto mb-4 animate-bounce">
+      <i class="fas fa-gem"></i>
+    </div>
+    <h3 class="font-extrabold text-lg text-gray-800 dark:text-white mb-1">অপর্যাপ্ত ব্যালেন্স!</h3>
+    <p class="text-xs font-bold text-rose-500 mb-2">Insufficient Balance, Please Buy.</p>
+    <p class="text-xs text-gray-500 dark:text-gray-400 mb-5 leading-relaxed">
+      পরীক্ষায় অংশগ্রহণের জন্য কমপক্ষে <b>১ ক্রেডিট</b> প্রয়োজন। আপনার ব্যালেন্সে কোনো ক্রেডিট নেই। দয়া করে ক্রেডিট কিনুন।
+    </p>
+
+    <!-- Buy Info -->
+    <div class="p-4 bg-sky-50 dark:bg-sky-950/30 rounded-2xl border border-sky-200 dark:border-sky-800/50 mb-5 text-left text-xs">
+      <div class="font-bold text-sky-800 dark:text-sky-300 mb-1 flex items-center gap-1.5">
+        <i class="fas fa-credit-card text-sky-500"></i> ক্রেডিট কেনার নিয়মাবলী:
+      </div>
+      <p class="text-gray-600 dark:text-gray-300 text-[11px] mb-2">বিকাশ বা নগদে পেমেন্ট সম্পন্ন করে অ্যাডমিনের সাথে যোগাযোগ করুন।</p>
+      <div class="font-mono font-bold text-gray-800 dark:text-white bg-white dark:bg-gray-900 px-3 py-2 rounded-lg border border-sky-100 dark:border-sky-900/40 flex justify-between items-center">
+        <span>01700000000 (bKash/Nagad)</span>
+        <button onclick="navigator.clipboard.writeText('01700000000'); showToast('নম্বর কপি হয়েছে!', 'success')" class="text-primary hover:underline text-[11px] font-bold">কপি</button>
+      </div>
+    </div>
+
+    <div class="space-y-2">
+      <button onclick="window.open('https://wa.me/8801700000000?text=Hello%20I%20want%20to%20buy%20MCQ%20Master%20Credits', '_blank')" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs shadow-md transition flex items-center justify-center gap-2">
+        <i class="fab fa-whatsapp text-sm"></i> হোয়াটসঅ্যাপে ক্রেডিট কিনুন
+      </button>
+      <button onclick="closeBalanceModal()" class="w-full py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-xl font-bold text-xs transition">
+        ফিরে যান
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ==================== TOAST CONTAINER ==================== -->
 <div id="toast-container" class="fixed top-5 left-0 right-0 z-[100] flex flex-col items-center gap-2 pointer-events-none px-4"></div>
 
@@ -315,8 +464,8 @@
         <i class="fas fa-xmark"></i>
       </button>
       <div class="flex items-center gap-3">
-        <div class="flex items-center gap-1.5 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-bold">
-          <i class="fas fa-clock text-xs"></i>
+        <div id="quiz-timer-container" class="flex items-center gap-1.5 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-bold">
+          <i class="fas fa-stopwatch text-xs"></i>
           <span id="quiz-timer">00:00</span>
         </div>
         <div class="text-sm font-bold text-gray-700 dark:text-gray-200">
@@ -344,11 +493,10 @@
 
 <!-- ==================== JAVASCRIPT ==================== -->
 <script>
-/* ---------- CONFIGURATIONS (Updated with your deployed Web App URL) ---------- */
+/* ---------- CONFIGURATIONS ---------- */
 const API_BASE = "https://script.google.com/macros/s/AKfycbw3ADqV5T86kriZFrsoBPlIXgAE8fhaOvnrBApqTIKs7HiwlYzJjFBv30rJccN4RBVVJQ/exec";
 const GOOGLE_CLIENT_ID = "263396988929-kp6c7oec4tfv38t9t6ls2pj4ghfkdilq.apps.googleusercontent.com";
 
-// Your Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyAc7uBUZXlVWY9wfwUIf3sk8gGVrECqtRs",
   authDomain: "call-app-d1a8b.firebaseapp.com",
@@ -378,7 +526,22 @@ let resendInterval = null;
 let subjectsData = [];
 let groupsData = [];
 let presetsData = [];
-let quiz = { questions: [], index: 0, score: 0, answers: {}, startTime: null, timer: null };
+
+// Quiz Engine State with Countdown Timer
+let quiz = {
+  questions: [],
+  index: 0,
+  score: 0,
+  answers: {},
+  durationMinutes: 20,
+  remainingSeconds: 1200,
+  timer: null
+};
+
+// Exam Setup Pending State
+let pendingExam = { filters: {}, count: 20, title: '' };
+let selectedExamMinutes = 20;
+
 let archiveSubTab = 'subject';
 let examSubTab = 'mock';
 
@@ -423,7 +586,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-/* ---------- STEP NAVIGATION ---------- */
+/* ---------- RE-LOGIN / ONBOARDING STEP CONTROLLER ---------- */
 function goToOnboardStep(step) {
   if (step === 2) {
     const nameVal = document.getElementById('temp-name').value.trim();
@@ -446,6 +609,14 @@ function goToOnboardStep(step) {
     currentPane.classList.remove('hidden');
     currentPane.classList.add('slide-up');
   }
+}
+
+function showLoginScreen() {
+  document.querySelectorAll('.step-pane').forEach(p => p.classList.add('hidden'));
+  const loginPane = document.getElementById('onboard-step-login');
+  loginPane.classList.remove('hidden');
+  loginPane.classList.add('slide-up');
+  setTimeout(initGoogleSignInLoginPane, 100);
 }
 
 function selectPrep(val) {
@@ -478,13 +649,67 @@ function togglePassVisibility(inputId, btn) {
   }
 }
 
+/* ---------- DIRECT LOGIN (Already have an Account) ---------- */
+async function handleDirectLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value.trim();
+
+  if (!email || !email.includes('@')) {
+    showToast('সঠিক ইমেইল অ্যাড্রেস লিখুন!', 'error');
+    return;
+  }
+  if (!password) {
+    showToast('আপনার পাসওয়ার্ড লিখুন!', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btn-direct-login');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner animate-spin"></i> যাচাই করা হচ্ছে...';
+
+  try {
+    const res = await api('getAccount', { email: email });
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span>লগইন সম্পন্ন করুন</span>';
+
+    if (!res || !res.found || !res.account) {
+      showToast('কোনো অ্যাকাউন্ট পাওয়া যায়নি! সঠিক ইমেইল দিন বা রেজিস্টার করুন।', 'error');
+      return;
+    }
+
+    // Check password match if password exists in sheet
+    if (res.account.password && res.account.password !== password) {
+      showToast('ভুল পাসওয়ার্ড! সঠিক পাসওয়ার্ড দিন।', 'error');
+      return;
+    }
+
+    // Success login
+    user = {
+      userId: res.account.userId || 'USR_' + Date.now().toString().slice(-6),
+      name: res.account.name || email.split('@')[0],
+      email: res.account.email,
+      mobile: res.account.mobile || '',
+      category: res.account.category || 'Admission',
+      examType: res.account.examType || 'Admission',
+      credits: Number(res.account.credits ?? 450),
+      diamonds: Number(res.account.credits ?? 450),
+      picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(res.account.name || 'User')}&background=10b981&color=fff`
+    };
+
+    saveUserAndContinue();
+  } catch (err) {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span>লগইন সম্পন্ন করুন</span>';
+    showToast('লগইন ব্যর্থ: ' + err.message, 'error');
+  }
+}
+
 /* ---------- OTP VERIFICATION FLOW ---------- */
 async function initiateEmailVerification() {
   const phone = document.getElementById('auth-phone').value.trim();
   const email = document.getElementById('auth-email').value.trim();
   const password = document.getElementById('auth-password').value.trim();
 
-  // 11 Digits BD phone validation
   const phoneRegex = /^(?:\+?88)?01[3-9]\d{8}$/;
   if (!phone || !phoneRegex.test(phone)) {
     showToast('১১ ডিজিটের সঠিক মোবাইল নম্বর দিন (যেমন: 017XXXXXXXX)!', 'error');
@@ -519,7 +744,7 @@ async function initiateEmailVerification() {
     if (res && res.otpSent === false) {
       diagBox.classList.remove('hidden');
       document.getElementById('otp-diagnostic-text').textContent =
-        "মেইল সার্ভার নোটিশ: " + (res.error || 'Apps Script অনুমতি প্রয়োজন') + " | টেস্ট কোড: " + generatedOTP;
+        "মেইল ডেলিভারি নোটিশ: " + (res.error || 'Apps Script পারমিশন প্রয়োজন') + " | টেস্ট কোড: " + generatedOTP;
       showToast('টেস্ট কোড স্ক্রিনে দেওয়া হয়েছে!', 'info');
     } else {
       diagBox.classList.add('hidden');
@@ -640,10 +865,25 @@ function initGoogleSignInOnboard() {
   }
 }
 
+function initGoogleSignInLoginPane() {
+  if (typeof google === 'undefined') return;
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: handleGoogleResponse
+  });
+  const el = document.getElementById('g_id_signin_login_pane');
+  if (el) {
+    el.innerHTML = '';
+    google.accounts.id.renderButton(el, {
+      theme: 'outline', size: 'large', shape: 'pill', text: 'signin_with', width: 280
+    });
+  }
+}
+
 async function handleGoogleResponse(response) {
   try {
     const payload = parseJwt(response.credential);
-    let mobile = document.getElementById('auth-phone').value.trim();
+    let mobile = document.getElementById('auth-phone')?.value?.trim() || '';
 
     if (!mobile || !/^(?:\+?88)?01[3-9]\d{8}$/.test(mobile)) {
       mobile = prompt("আপনার ১১ ডিজিটের মোবাইল নম্বরটি লিখুন (বাধ্যতামূলক):", "01");
@@ -774,7 +1014,7 @@ async function syncUserCredits() {
 }
 
 function updateDiamondDisplay() {
-  const diamonds = user?.credits ?? 450;
+  const diamonds = user?.credits ?? 0;
   const elements = document.querySelectorAll('.user-credits-badge');
   elements.forEach(el => { el.textContent = diamonds; });
 }
@@ -837,7 +1077,7 @@ function switchTab(tab) {
 function renderHome() {
   const totalQ = subjectsData.reduce((a, b) => a + (b.count || 0), 0) || 1500;
   const targetLabel = user?.category || 'Admission';
-  const diamonds = user?.credits ?? 450;
+  const diamonds = user?.credits ?? 0;
 
   const html = `
     <div class="slide-up">
@@ -855,7 +1095,7 @@ function renderHome() {
 
         <!-- Diamonds Badge -->
         <div class="flex items-center gap-2">
-          <div class="flex items-center gap-1.5 bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-300 px-3 py-1.5 rounded-full text-xs font-bold border border-sky-200 dark:border-sky-800/60 shadow-sm">
+          <div onclick="openBalanceModal()" class="cursor-pointer flex items-center gap-1.5 bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-300 px-3 py-1.5 rounded-full text-xs font-bold border border-sky-200 dark:border-sky-800/60 shadow-sm hover:scale-105 transition">
             <i class="fas fa-gem text-sky-500 animate-pulse"></i>
             <span class="user-credits-badge font-mono text-sm">${diamonds}</span>
           </div>
@@ -868,9 +1108,9 @@ function renderHome() {
       <!-- Quick Action Cards -->
       <div class="grid grid-cols-3 gap-2.5 mb-5">
         ${quickActionCard('প্রশ্ন ব্যাংক', 'fa-book-open', 'bg-amber-100 text-amber-600', "switchTab('archive')")}
-        ${quickActionCard('দ্রুত কুইজ', 'fa-bolt', 'bg-yellow-100 text-yellow-600', "startQuickPractice()")}
+        ${quickActionCard('দ্রুত কুইজ', 'fa-bolt', 'bg-yellow-100 text-yellow-600', "promptExamSetup({}, 10, 'দ্রুত কুইজ (১০টি প্রশ্ন)')")}
         ${quickActionCard('মক টেস্ট', 'fa-clipboard-check', 'bg-rose-100 text-rose-600', "switchTab('exam')")}
-        ${quickActionCard('ক্রেডিট শপ', 'fa-gem', 'bg-sky-100 text-sky-600', "showToast('শিটের Credits কলামে লিখলে এখানে অটো শো করবে', 'info')")}
+        ${quickActionCard('ক্রেডিট কিনুন', 'fa-gem', 'bg-sky-100 text-sky-600', "openBalanceModal()")}
         ${quickActionCard('রিভিশন', 'fa-rotate-left', 'bg-purple-100 text-purple-600', "showToast('ভুল উত্তরের রিভিশন সেকশন প্রস্তুত হচ্ছে', 'info')")}
         ${quickActionCard('লিডারবোর্ড', 'fa-trophy', 'bg-emerald-100 text-emerald-600', "showToast('শীঘ্রই লিডারবোর্ড প্রকাশিত হবে', 'info')")}
       </div>
@@ -881,12 +1121,12 @@ function renderHome() {
           <div class="text-2xl font-black text-primary">${totalQ}+</div>
           <div class="text-xs text-gray-500 dark:text-gray-400 font-medium">মোট প্রশ্ন সংখ্যা</div>
         </div>
-        <div class="bg-white dark:bg-gray-800/80 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800">
+        <div onclick="openBalanceModal()" class="cursor-pointer bg-white dark:bg-gray-800/80 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800">
           <div class="text-2xl font-black text-sky-500 flex items-center gap-1">
             <span class="user-credits-badge">${diamonds}</span>
             <span class="text-sm font-semibold">💎</span>
           </div>
-          <div class="text-xs text-gray-500 dark:text-gray-400 font-medium">আপনার মোট ক্রেডিট</div>
+          <div class="text-xs text-gray-500 dark:text-gray-400 font-medium">উপলব্ধ ক্রেডিট (১ পরীক্ষা = ১ ক্রেডিট)</div>
         </div>
       </div>
 
@@ -898,7 +1138,7 @@ function renderHome() {
         </div>
         <div class="flex gap-3 overflow-x-auto no-scrollbar pb-1">
           ${subjectsData.map(s => `
-            <div onclick="startSubjectQuiz('${s.subject}')" class="flex-shrink-0 w-32 bg-gradient-to-br ${getSubjectGradient(s.subject)} rounded-2xl p-3.5 text-white cursor-pointer active:scale-95 transition shadow-sm">
+            <div onclick="promptExamSetup({ subject: '${s.subject}' }, 20, '${s.subject}')" class="flex-shrink-0 w-32 bg-gradient-to-br ${getSubjectGradient(s.subject)} rounded-2xl p-3.5 text-white cursor-pointer active:scale-95 transition shadow-sm">
               <div class="text-2xl mb-3 opacity-90"><i class="fas ${getSubjectIcon(s.subject)}"></i></div>
               <div class="text-sm font-bold truncate">${s.subject}</div>
               <div class="text-[10px] opacity-80 mt-0.5">${s.count || 0}টি প্রশ্ন</div>
@@ -951,14 +1191,14 @@ function setArchiveTab(t) { archiveSubTab = t; renderArchive(); }
 function renderSubjectArchive() {
   if (!subjectsData.length) return '<div class="col-span-2 text-center py-10 text-gray-400 text-xs">প্রশ্ন লোড হচ্ছে...</div>';
   return subjectsData.map(s => `
-    <div onclick="startSubjectQuiz('${s.subject}')" class="subject-card filter-target bg-gradient-to-br ${getSubjectGradient(s.subject)} rounded-2xl p-4 text-white cursor-pointer h-32 flex flex-col justify-between shadow-sm">
+    <div onclick="promptExamSetup({ subject: '${s.subject}' }, 20, '${s.subject}')" class="subject-card filter-target bg-gradient-to-br ${getSubjectGradient(s.subject)} rounded-2xl p-4 text-white cursor-pointer h-32 flex flex-col justify-between shadow-sm">
       <div class="flex justify-between items-start">
         <i class="fas ${getSubjectIcon(s.subject)} text-2xl opacity-40"></i>
         <span class="bg-white/20 px-2 py-0.5 rounded-lg text-[10px] font-bold">${s.count} টি</span>
       </div>
       <div>
         <h4 class="font-bold text-sm leading-tight">${s.subject}</h4>
-        <span class="text-[10px] opacity-80">অনুশীলন শুরু করুন</span>
+        <span class="text-[10px] opacity-80">পরীক্ষা দিন (১ ক্রেডিট)</span>
       </div>
     </div>
   `).join('');
@@ -967,7 +1207,7 @@ function renderSubjectArchive() {
 function renderInstArchive() {
   if (!groupsData.length) return '<div class="col-span-2 text-center py-10 text-gray-400 text-xs">কোনো প্রতিষ্ঠান পাওয়া যায়নি</div>';
   return groupsData.map(g => `
-    <div onclick="startGroupQuiz('${g.group}')" class="subject-card filter-target bg-gradient-to-br from-slate-700 to-slate-900 rounded-2xl p-4 text-white cursor-pointer h-32 flex flex-col justify-between shadow-sm">
+    <div onclick="promptExamSetup({ groupId: '${g.group}' }, 20, '${getGroupDisplay(g.group)} প্রশ্নব্যাংক')" class="subject-card filter-target bg-gradient-to-br from-slate-700 to-slate-900 rounded-2xl p-4 text-white cursor-pointer h-32 flex flex-col justify-between shadow-sm">
       <div class="flex justify-between items-start">
         <span class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center font-black text-sm uppercase">${g.group.slice(0,2)}</span>
         <span class="bg-white/20 px-2 py-0.5 rounded-lg text-[10px] font-bold">${g.count} টি</span>
@@ -999,10 +1239,10 @@ function renderExam() {
       ${examSubTab === 'mock' ? `
         <div class="space-y-4">
           <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
-            <h4 class="font-bold text-sm text-gray-800 dark:text-white mb-3">বিষয়ভিত্তিক টেস্ট (২০ প্রশ্ন)</h4>
+            <h4 class="font-bold text-sm text-gray-800 dark:text-white mb-3">বিষয়ভিত্তিক টেস্ট (২০ প্রশ্ন • ১ ক্রেডিট)</h4>
             <div class="grid grid-cols-2 gap-2">
               ${subjectsData.map(s => `
-                <button onclick="startSubjectQuiz('${s.subject}', 20)" class="p-3 rounded-xl border border-gray-100 dark:border-gray-700/80 bg-gray-50 dark:bg-gray-700/40 text-left hover:border-primary transition flex items-center gap-2">
+                <button onclick="promptExamSetup({ subject: '${s.subject}' }, 20, '${s.subject}')" class="p-3 rounded-xl border border-gray-100 dark:border-gray-700/80 bg-gray-50 dark:bg-gray-700/40 text-left hover:border-primary transition flex items-center gap-2">
                   <div class="w-6 h-6 rounded-md bg-primary/10 text-primary flex items-center justify-center text-xs"><i class="fas ${getSubjectIcon(s.subject)}"></i></div>
                   <span class="text-xs font-bold text-gray-700 dark:text-gray-200 truncate">${s.subject}</span>
                 </button>
@@ -1014,7 +1254,7 @@ function renderExam() {
             <h4 class="font-bold text-sm text-gray-800 dark:text-white mb-3">বিশ্ববিদ্যালয় প্রিসেট</h4>
             <div class="flex flex-wrap gap-2">
               ${presetsData.slice(0, 10).map(p => `
-                <button onclick="startPresetQuiz('${p.group}', '${p.unit}')" class="px-3 py-2 rounded-xl text-xs font-bold bg-primary/10 hover:bg-primary hover:text-white text-primary transition">
+                <button onclick="promptExamSetup({ groupId: '${p.group}', unit: '${p.unit}' }, 20, '${getGroupDisplay(p.group)} - ${p.unit}')" class="px-3 py-2 rounded-xl text-xs font-bold bg-primary/10 hover:bg-primary hover:text-white text-primary transition">
                   ${getGroupDisplay(p.group)} - ${p.unit}
                 </button>
               `).join('')}
@@ -1027,8 +1267,8 @@ function renderExam() {
             <i class="fas fa-bolt"></i>
           </div>
           <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-1">র‍্যান্ডম কুইক টেস্ট</h3>
-          <p class="text-xs text-gray-400 mb-6">সকল বিষয় থেকে বাছাই করা ১০টি এমসিকিউ</p>
-          <button onclick="startQuickPractice()" class="w-full py-3.5 bg-primary hover:bg-primaryDark text-white font-bold rounded-2xl shadow-lg shadow-primary/30 transition">
+          <p class="text-xs text-gray-400 mb-6">সকল বিষয় থেকে বাছাই করা ১০টি এমসিকিউ (খরচ: ১ ক্রেডিট)</p>
+          <button onclick="promptExamSetup({}, 10, 'র‍্যান্ডম কুইক টেস্ট')" class="w-full py-3.5 bg-primary hover:bg-primaryDark text-white font-bold rounded-2xl shadow-lg shadow-primary/30 transition">
             শুরু করুন
           </button>
         </div>
@@ -1074,7 +1314,7 @@ function renderMisc() {
       <div class="p-5 rounded-2xl bg-gradient-to-tr from-primary to-emerald-600 text-white text-center shadow-lg shadow-primary/20">
         <i class="fas fa-graduation-cap text-3xl mb-2"></i>
         <h4 class="font-extrabold text-base">MCQ Master Pro</h4>
-        <p class="text-xs opacity-80 mt-0.5">ভার্সন ৬.২ • সম্পূর্ণ লাইভ ও সিঙ্কড সিস্টেম</p>
+        <p class="text-xs opacity-80 mt-0.5">ভার্সন ৭.০ • ১ পরীক্ষা ১ ক্রেডিট ও টাইমার সিস্টেম</p>
       </div>
     </div>
   `;
@@ -1095,7 +1335,7 @@ function clearCache() {
 
 /* ---------- PROFILE TAB ---------- */
 function renderProfile() {
-  const diamonds = user?.credits ?? 450;
+  const diamonds = user?.credits ?? 0;
   const html = `
     <div class="slide-up">
       <h2 class="text-xl font-black text-gray-800 dark:text-white mb-4">প্রোফাইল প্যানেল</h2>
@@ -1109,10 +1349,11 @@ function renderProfile() {
         <p class="text-xs text-emerald-600 font-bold mb-3"><i class="fas fa-phone mr-1"></i>${user?.mobile || 'মোবাইল নম্বর নেই'}</p>
 
         <!-- Credits Card -->
-        <div class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-sky-500/10 to-blue-500/10 border border-sky-300 dark:border-sky-800 rounded-2xl mb-4">
+        <div onclick="openBalanceModal()" class="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-sky-500/10 to-blue-500/10 border border-sky-300 dark:border-sky-800 rounded-2xl mb-4 hover:scale-105 transition">
           <i class="fas fa-gem text-sky-500 text-lg"></i>
           <span class="text-xs font-bold text-gray-600 dark:text-gray-300">উপলব্ধ ক্রেডিট:</span>
           <span class="user-credits-badge font-black text-sky-600 dark:text-sky-400 font-mono text-base">${diamonds}</span>
+          <span class="text-[10px] bg-sky-500 text-white font-bold px-1.5 py-0.5 rounded ml-1">কিনুন +</span>
         </div>
         
         <div>
@@ -1197,39 +1438,152 @@ function logout() {
   location.reload();
 }
 
-/* ---------- QUIZ ENGINE ---------- */
-async function startSubjectQuiz(subject, count = 20) { await fetchAndRunQuiz({ subject }, count); }
-async function startGroupQuiz(group) { await fetchAndRunQuiz({ groupId: group }, 20); }
-async function startPresetQuiz(group, unit) { await fetchAndRunQuiz({ groupId: group, unit: unit }, 20); }
-async function startQuickPractice() { await fetchAndRunQuiz({}, 10); }
+/* ---------- INSUFFICIENT BALANCE MODAL CONTROLS ---------- */
+function openBalanceModal() {
+  document.getElementById('balance-modal').classList.remove('hidden');
+}
+function closeBalanceModal() {
+  document.getElementById('balance-modal').classList.add('hidden');
+}
 
-async function fetchAndRunQuiz(filters, count) {
+/* ---------- EXAM TIME SETUP (10, 20, 30, 40, 60 MIN) ---------- */
+function promptExamSetup(filters, count, title) {
+  // Check credit balance first
+  const currentCredits = Number(user?.credits ?? 0);
+  if (currentCredits < 1) {
+    openBalanceModal();
+    return;
+  }
+
+  pendingExam = { filters, count, title };
+  selectedExamMinutes = 20; // default 20 minutes
+  updateTimeUI(20);
+
+  document.getElementById('setup-exam-title').textContent = title;
+  document.getElementById('exam-time-modal').classList.remove('hidden');
+}
+
+function closeExamTimeModal() {
+  document.getElementById('exam-time-modal').classList.add('hidden');
+}
+
+function selectExamTime(mins) {
+  selectedExamMinutes = mins;
+  updateTimeUI(mins);
+}
+
+function stepExamTime(delta) {
+  const allowed = [10, 20, 30, 40, 60];
+  let currIdx = allowed.indexOf(selectedExamMinutes);
+  if (currIdx === -1) currIdx = 1; // default index of 20
+  let newIdx = currIdx + (delta > 0 ? 1 : -1);
+  if (newIdx >= 0 && newIdx < allowed.length) {
+    selectExamTime(allowed[newIdx]);
+  }
+}
+
+function updateTimeUI(mins) {
+  document.getElementById('display-selected-time').textContent = mins + ' মিনিট';
+  document.querySelectorAll('.time-btn').forEach(btn => {
+    const btnTime = Number(btn.getAttribute('data-time'));
+    if (btnTime === mins) {
+      btn.classList.add('border-primary', 'bg-primary', 'text-white');
+      btn.classList.remove('border-gray-200', 'dark:border-gray-700', 'text-gray-700', 'dark:text-gray-300');
+    } else {
+      btn.classList.remove('border-primary', 'bg-primary', 'text-white');
+      btn.classList.add('border-gray-200', 'dark:border-gray-700', 'text-gray-700', 'dark:text-gray-300');
+    }
+  });
+}
+
+/* ---------- 1 EXAM = 1 CREDIT DEDUCTION & QUIZ START ---------- */
+async function confirmAndStartQuiz() {
+  closeExamTimeModal();
+
+  const currentCredits = Number(user?.credits ?? 0);
+  if (currentCredits < 1) {
+    openBalanceModal();
+    return;
+  }
+
+  // 1. Deduct 1 credit locally
+  user.credits = Math.max(0, currentCredits - 1);
+  localStorage.setItem('mcq_user', JSON.stringify(user));
+  updateDiamondDisplay();
+
+  // 2. Background sync to Google Sheet & Firebase
+  api('deductCredit', { email: user.email, amount: 1 });
+  if (fbDatabase && user.email) {
+    const cleanEmail = user.email.replace(/[.#$[\]]/g, "_");
+    fbDatabase.ref('users/' + cleanEmail + '/credits').set(user.credits);
+  }
+
+  showToast('১ ক্রেডিট ব্যবহার হয়েছে (অবশিষ্ট: ' + user.credits + ' 💎)', 'info');
+
+  // 3. Launch Quiz with countdown timer
+  await fetchAndRunQuiz(pendingExam.filters, pendingExam.count, selectedExamMinutes);
+}
+
+/* ---------- QUIZ ENGINE WITH COUNTDOWN TIMER ---------- */
+async function fetchAndRunQuiz(filters, count, durationMinutes) {
   showToast('প্রশ্ন লোড হচ্ছে...', 'info');
   const res = await api('random', { ...filters, count: count });
   quiz.questions = res.questions || [];
 
   if (!quiz.questions.length) {
     showToast('কোনো প্রশ্ন পাওয়া যায়নি!', 'error');
+    // Refund credit if questions not found
+    user.credits = Number(user.credits || 0) + 1;
+    localStorage.setItem('mcq_user', JSON.stringify(user));
+    updateDiamondDisplay();
     return;
   }
 
   quiz.index = 0;
   quiz.score = 0;
   quiz.answers = {};
-  quiz.startTime = Date.now();
+  quiz.durationMinutes = durationMinutes;
+  quiz.remainingSeconds = durationMinutes * 60;
+
   document.getElementById('quiz-modal').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
-  startQuizTimer();
+
+  startQuizCountdownTimer();
   renderCurrentQuestion();
 }
 
-function startQuizTimer() {
+function startQuizCountdownTimer() {
   if (quiz.timer) clearInterval(quiz.timer);
+  const timerDisplay = document.getElementById('quiz-timer');
+  const timerContainer = document.getElementById('quiz-timer-container');
+
+  const updateDisplay = () => {
+    const m = String(Math.floor(quiz.remainingSeconds / 60)).padStart(2, '0');
+    const s = String(quiz.remainingSeconds % 60).padStart(2, '0');
+    timerDisplay.textContent = `${m}:${s}`;
+
+    // Alert color if less than 2 minutes left
+    if (quiz.remainingSeconds <= 120) {
+      timerContainer.classList.add('bg-rose-500/10', 'text-rose-500', 'animate-pulse');
+      timerContainer.classList.remove('bg-primary/10', 'text-primary');
+    } else {
+      timerContainer.classList.remove('bg-rose-500/10', 'text-rose-500', 'animate-pulse');
+      timerContainer.classList.add('bg-primary/10', 'text-primary');
+    }
+  };
+
+  updateDisplay();
+
   quiz.timer = setInterval(() => {
-    const elapsed = Math.floor((Date.now() - quiz.startTime) / 1000);
-    const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
-    const s = String(elapsed % 60).padStart(2, '0');
-    document.getElementById('quiz-timer').textContent = `${m}:${s}`;
+    quiz.remainingSeconds--;
+    updateDisplay();
+
+    // Auto submit when time runs out
+    if (quiz.remainingSeconds <= 0) {
+      clearInterval(quiz.timer);
+      showToast('সময় সমাপ্ত! উত্তরপত্র জমা নেওয়া হচ্ছে...', 'info');
+      finishQuiz();
+    }
   }, 1000);
 }
 
@@ -1331,9 +1685,11 @@ function finishQuiz() {
 }
 
 function closeQuiz() {
-  if (quiz.timer) clearInterval(quiz.timer);
-  document.getElementById('quiz-modal').classList.add('hidden');
-  document.body.style.overflow = '';
+  if (confirm("আপনি কি নিশ্চিতভাবে পরীক্ষা থেকে বের হতে চান?")) {
+    if (quiz.timer) clearInterval(quiz.timer);
+    document.getElementById('quiz-modal').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
 }
 
 /* ---------- TOAST UTILS ---------- */
